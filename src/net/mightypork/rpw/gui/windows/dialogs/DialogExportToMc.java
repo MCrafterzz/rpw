@@ -8,10 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -27,6 +24,7 @@ import net.mightypork.rpw.gui.windows.RpwDialog;
 import net.mightypork.rpw.gui.windows.messages.Alerts;
 import net.mightypork.rpw.project.Projects;
 import net.mightypork.rpw.tasks.Tasks;
+import net.mightypork.rpw.tasks.sequences.SequenceExportProject;
 import net.mightypork.rpw.utils.files.FileUtils;
 import net.mightypork.rpw.utils.files.OsUtils;
 import net.mightypork.rpw.utils.files.SimpleConfig;
@@ -152,7 +150,8 @@ public class DialogExportToMc extends RpwDialog
 	@Override
 	protected void onShown()
 	{
-		nameField.setText(Projects.getActive().getName());
+		nameField.setText(Projects.getActive().getTitle());
+		descriptionField.setText(Projects.getActive().getDescription());
 	}
 
 	private final ActionListener exportListener = new ActionListener() {
@@ -285,4 +284,3 @@ public class DialogExportToMc extends RpwDialog
 	};
 
 }
-
