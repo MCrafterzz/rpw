@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import net.mightypork.rpw.App;
 import net.mightypork.rpw.Config;
 import net.mightypork.rpw.Const;
+import net.mightypork.rpw.gui.windows.dialogs.DialogExportToMc;
 import net.mightypork.rpw.gui.windows.messages.Alerts;
 import net.mightypork.rpw.library.MagicSources;
 import net.mightypork.rpw.library.Sources;
@@ -29,6 +30,8 @@ import net.mightypork.rpw.utils.files.FileUtils;
 import net.mightypork.rpw.utils.files.ZipBuilder;
 import net.mightypork.rpw.utils.logging.Log;
 
+import javax.swing.*;
+
 
 public class SequenceExportProject extends AbstractMonitoredSequence
 {
@@ -37,7 +40,6 @@ public class SequenceExportProject extends AbstractMonitoredSequence
 	private ZipBuilder zb;
 	private final Project project;
 	private final Runnable successRunnable;
-
 
 	public SequenceExportProject(File target, Runnable onSuccess)
 	{
@@ -177,61 +179,11 @@ public class SequenceExportProject extends AbstractMonitoredSequence
 
 		final PackMcmeta packMeta = new PackMcmeta();
 
-		String vers = Config.LIBRARY_VERSION.split("\\+")[0];
-
-		// Determine format from version
-
-		Matcher matcher_mnp = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+).*").matcher(vers);
-		Matcher matcher_mn = Pattern.compile("^(\\d+)\\.(\\d+).*").matcher(vers);
-		Matcher matcher_snapshot = Pattern.compile("^(\\d{2}w\\d{2}).*").matcher(vers);
-
-		Matcher m;
-
-		int format = 2;
-
-		do {
-			m = matcher_mnp;
-			if (m.find()) {
-				// Regular release
-				int major = Integer.valueOf(m.group(1));
-				int minor = Integer.valueOf(m.group(2));
-				int patch = Integer.valueOf(m.group(3));
-
-				if (major > 1 || (major == 1 && minor >= 9)) {
-					format = 2;
-				} else {
-					format = 1;
-				}
-				break;
-			}
-
-			m = matcher_mn;
-			if (m.find()) {
-				// Regular release
-				int major = Integer.valueOf(m.group(1));
-				int minor = Integer.valueOf(m.group(2));
-
-				if (major > 1 || (major == 1 && minor >= 9)) {
-					format = 2;
-				} else {
-					format = 1;
-				}
-				break;
-			}
-
-			m = matcher_snapshot;
-			if (m.find()) {
-				// Snapshot
-				format = 2; // just assume it's the newest...
-				break;
-			}
-
-			Log.e("Unexpected MC version name, cannot determine pack format.");
-		} while(false);
+		int format = Projects.getActive().getPackMeta();
 
 		Log.i("Using resource pack format: " + format);
 
-		packMeta.setPackInfo(new PackInfo(format, desc));
+            packMeta.setPackInfo(new PackInfo(format, desc));
 
 		zb.addString("pack.mcmeta", packMeta.toJson());
 
@@ -400,5 +352,34 @@ public class SequenceExportProject extends AbstractMonitoredSequence
 		}
 	}
 
-	;
+	public static int getPackMetaNumber(){
+		String vers = Config.LIBRARY_VERSION.split("\\+")[0];
+
+		Matcher matcher_mnp = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+).*").matcher(vers);
+		Matcher matcher_mn = Pattern.compile("^(\\d+)\\.(\\d+).*").matcher(vers);
+		Matcher matcher_snapshot = Pattern.compile("^(\\d{2}w\\d{2}).*").matcher(vers);
+
+		Matcher m;
+
+			m = matcher_mn;
+			if (m.find()) {
+				// Regular release
+				int major = Integer.valueOf(m.group(1));
+				int minor = Integer.valueOf(m.group(2));
+
+                if(major == 1 && minor < 9){
+                    return 1;
+                }else if(major > 1 || (major == 1 && minor > 10)){
+					return 3;
+				}
+				else if (major == 1 && (minor == 9 || minor == 10)) {
+					return 2;
+				}else{
+                    return 3;
+                }
+			}
+			return 3;
+	}
+
 }
+
