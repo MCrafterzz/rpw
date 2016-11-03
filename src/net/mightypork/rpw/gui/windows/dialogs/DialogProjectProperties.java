@@ -33,7 +33,7 @@ public class DialogProjectProperties extends RpwDialog
 {
 
 	private FileChooser fc;
-	private JTextField titleField;
+
 	private JButton buttonOK;
 	private JLabel imageView;
 
@@ -74,13 +74,12 @@ public class DialogProjectProperties extends RpwDialog
 		vbox.gap();
 
 		// form
-		titleField = Gui.textField("", "Resource pack title", "Title shown in Minecraft");
 
 		nameField = Gui.textField("", "Project folder name", "Name of the project folder");
 		nameField.setEditable(false);
 		nameField.setBackground(new Color(0xeeeeee));
 
-		vbox.springForm(new String[] { "Description:", "Name:" }, new JComponent[] { titleField, nameField });
+		vbox.springForm(new String[] {"Name:" }, new JComponent[] {nameField });
 
 		vbox.gap();
 		vbox.add(Gui.commentLine("Use \"My Projects\" dialog to rename project."));
@@ -118,7 +117,6 @@ public class DialogProjectProperties extends RpwDialog
 	@Override
 	protected void onShown()
 	{
-		titleField.setText(Projects.getActive().getTitle());
 		nameField.setText(Projects.getActive().getName());
 	}
 
@@ -160,16 +158,7 @@ public class DialogProjectProperties extends RpwDialog
 		@Override
 		public void actionPerformed(ActionEvent e)
 		{
-			final String title = titleField.getText().trim();
-
-			if (title.length() == 0) {
-				Alerts.error(self(), "Please, enter project title.");
-				return;
-			}
-
-			Projects.getActive().setTitle(title);
-
-			closeDialog();
+            closeDialog();
 		}
 	};
 
