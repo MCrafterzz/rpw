@@ -43,6 +43,8 @@ public class DialogProjectProperties extends RpwDialog
 	private JButton btnIconDefault;
 	private JButton btnIconRefresh;
 	private JTextField nameField;
+	private JTextField titleField;
+	private JTextField descriptionField;
 
 
 	private void redrawIcon()
@@ -78,8 +80,10 @@ public class DialogProjectProperties extends RpwDialog
 		nameField = Gui.textField("", "Project folder name", "Name of the project folder");
 		nameField.setEditable(false);
 		nameField.setBackground(new Color(0xeeeeee));
+        titleField = Gui.textField("", "Project title", "Title of project");
+        descriptionField = Gui.textField("", "Project description", "Description of project");
 
-		vbox.springForm(new String[] {"Name:" }, new JComponent[] {nameField });
+		vbox.springForm(new String[] {"Name:" , "Title:","Description:"}, new JComponent[] {nameField,titleField,descriptionField });
 
 		vbox.gap();
 		vbox.add(Gui.commentLine("Use \"My Projects\" dialog to rename project."));
@@ -118,6 +122,8 @@ public class DialogProjectProperties extends RpwDialog
 	protected void onShown()
 	{
 		nameField.setText(Projects.getActive().getName());
+        titleField.setText(Projects.getActive().getTitle());
+        descriptionField.setText(Projects.getActive().getDescription());
 	}
 
 
@@ -137,7 +143,8 @@ public class DialogProjectProperties extends RpwDialog
 	@Override
 	public void onClose()
 	{
-		Tasks.taskOnProjectPropertiesChanged();
+		Projects.getActive().setDescription(descriptionField.getText());
+        Tasks.taskOnProjectPropertiesChanged();
 	}
 
 
